@@ -1,0 +1,27 @@
+{
+  "model": "independent unit-mean exponential CUT and training powers",
+  "sector_counts": [
+    26,
+    26,
+    12,
+    12
+  ],
+  "seed": 20261005,
+  "trials": 200000,
+  "nominal_pfa": 0.01,
+  "five_sigma_tolerance": 0.0011124297730643494,
+  "results": [
+    {
+      "mode": "GOCA",
+      "alpha": 3.87080438027649,
+      "before_pfa": 0.00199,
+      "after_pfa": 0.009595
+    },
+    {
+      "mode": "SOCA",
+      "alpha": 6.70832849259684,
+      "before_pfa": 0.02249,
+      "after_pfa": 0.009725
+    }
+  ]
+}

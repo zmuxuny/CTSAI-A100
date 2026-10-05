@@ -125,6 +125,17 @@ noise = min(μ1, μ2, μ3, μ4)
 
 它对弱目标更敏感，但在杂波边缘容易产生虚警。
 
+固定 GOCA/SOCA 模式的阈值为 `alpha * noise`。对独立指数功率噪声，含
+`N_i` 个训练单元的分区均值服从 `Gamma(N_i, 1/N_i)`。最大或最小均值的
+分布包含所有分区，因而 `alpha` 由 `E[exp(-alpha * noise)] = Pfa` 求解。
+`sector_cfar_alpha.m` 使用这些 Gamma 分布的 CDF/PDF 做正值积分和二分求解，
+并缓存相同窗口的系数。单分区时与 CA-CFAR 系数一致。
+
+该标定对应独立指数噪声模型。通道功率积累、窗引入的训练单元相关性，以及
+VI 的数据相关分支选择，需要相应的模型或实验标定。可运行
+`run_sector_threshold_tests` 检查解析特例；安装 NumPy 和 Octave 后，运行
+`python tests/verify_sector_false_alarm.py` 可复现不等分区的 20 万次独立噪声验证。
+
 ## 5. 二维 VI-CFAR
 
 工程实现的是面向 Range-Doppler 图的实用型二维 variability-index CFAR。
