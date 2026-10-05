@@ -28,4 +28,12 @@ for dR = -halfR:halfR
 end
 sectorCounts = squeeze(sum(sum(sectorKernels,1),2));
 sectorCounts = sectorCounts(:).';
+active = sectorCounts > 0;
+if ~any(active)
+    error('CTSAI:NoTrainingCells', 'CFAR requires at least one training cell.');
+end
+% A range-only or Doppler-only ring has fewer than four nonempty sectors.
+% Exclude empty sectors before computing means and variability indices.
+sectorKernels = sectorKernels(:,:,active);
+sectorCounts = sectorCounts(active);
 end

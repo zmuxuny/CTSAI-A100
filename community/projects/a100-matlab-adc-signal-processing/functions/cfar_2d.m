@@ -7,6 +7,9 @@ guardD = cfarOpts.guard_cells(2);
 halfR = trainR + guardR;
 halfD = trainD + guardD;
 algorithm = upper(strtrim(cfarOpts.algorithm));
+if trainR == 0 && trainD == 0
+    error('CTSAI:NoTrainingCells', 'CFAR requires at least one training cell.');
+end
 
 switch algorithm
     case 'CA'
