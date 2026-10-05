@@ -12,7 +12,6 @@ numSignals = min(angleOpts.music_signal_count, numChannels-1);
 noiseSubspace = eigenVectors(:, numSignals+1:end);
 denominator = sum(abs(noiseSubspace' * dictionary).^2, 1);
 spectrum = 1 ./ max(denominator, eps);
-[~, iPeak] = max(spectrum);
-result.angle_deg = angleGridDeg(iPeak);
+[result.angle_deg, result.valid] = angle_spectrum_peak(spectrum, angleGridDeg);
 result.spectrum = spectrum;
 end

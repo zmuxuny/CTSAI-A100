@@ -251,7 +251,11 @@ OMP 把角度导向矢量组成字典，逐次选择与残差相关性最大的�
 - `Power_dB`、`Noise_dB`、`Threshold_dB`、`SNR_dB`；
 - `CFARMethod`、`VariabilityIndex`、`SectorMeanRatio`；
 - `AngleFFT_deg`、`DML_deg`、`MUSIC_deg`、`OMP_deg`；
-- `SelectedAngle_deg`：配置指定的最终角度。
+- `SelectedAngle_deg`：配置指定的最终角度；
+- `SelectedAngleValid`：所选方法的数值谱峰是否可区分。
+
+无信号、单天线或重合天线几何产生常数谱时，估计器返回 `NaN`，
+`SelectedAngleValid` 为 `false`。导出表因此可以区分可用角度与不可用角度。
 
 点云坐标使用：
 

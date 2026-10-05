@@ -10,12 +10,10 @@ for iSource = 1:angleOpts.omp_max_sources
     coefficients = dictionary(:, selected) \ snapshot;
     residual = snapshot - dictionary(:, selected) * coefficients;
 end
-if isempty(selected)
-    [~, index] = max(correlationSpectrum);
-else
-    index = selected(1);
+[result.angle_deg, result.valid] = angle_spectrum_peak(correlationSpectrum, angleGridDeg);
+if ~result.valid
+    selected = [];
 end
-result.angle_deg = angleGridDeg(index);
 result.spectrum = correlationSpectrum.';
 result.selected_indices = selected;
 end
