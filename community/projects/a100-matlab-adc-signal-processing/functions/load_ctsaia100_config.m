@@ -16,13 +16,15 @@ cfg = struct();
 duplicateFields = {};
 parsedFields = {};
 
-for iLine = 1:numel(lines)
+iLine = 0;
+while iLine < numel(lines)
+    iLine = iLine + 1;
     line = strtrim(regexprep(lines{iLine}, '//.*$', ''));
-    if isempty(line) || ~startsWith(line, '.')
+    if isempty(line) || ~strncmp(line, '.', 1)
         continue;
     end
 
-    token = regexp(line, '^\.(\w+)\s*=\s*(.*?)\s*,?\s*$', ...
+    token = regexp(line, '^\.(\w+)\s*=\s*(.*?)\s*$', ...
         'tokens', 'once');
     if isempty(token)
         warning('Ignoring unrecognized configuration line %d: %s', ...
@@ -31,10 +33,32 @@ for iLine = 1:numel(lines)
     end
 
     fieldName = token{1};
+    rawValue = token{2};
+    if strncmp(strtrim(rawValue), '{', 1)
+        % A designated initializer may put its numeric array on several
+        % lines. Keep commas until the entire initializer has been read.
+        firstLine = iLine;
+        balance = sum(rawValue == '{') - sum(rawValue == '}');
+        while balance > 0 && iLine < numel(lines)
+            iLine = iLine + 1;
+            continuation = strtrim(regexprep(lines{iLine}, '//.*$', ''));
+            if ~isempty(regexp(continuation, '^\.\w+\s*=', 'once'))
+                error('CTSAI:UnclosedConfigArray', ...
+                    'Array for field %s is unfinished before line %d.', fieldName, iLine);
+            end
+            rawValue = [rawValue ' ' continuation]; %#ok<AGROW>
+            balance = balance + sum(continuation == '{') - sum(continuation == '}');
+        end
+        if balance ~= 0
+            error('CTSAI:UnclosedConfigArray', ...
+                'Unbalanced array for field %s starting at line %d.', fieldName, firstLine);
+        end
+    end
+    rawValue = regexprep(strtrim(rawValue), ',\s*$', '');
     if isfield(cfg, fieldName)
         duplicateFields{end+1} = fieldName; %#ok<AGROW>
     end
-    cfg.(fieldName) = parse_hxx_value(token{2}, fieldName);
+    cfg.(fieldName) = parse_hxx_value(rawValue, fieldName);
     parsedFields{end+1} = fieldName; %#ok<AGROW>
 end
 
@@ -68,7 +92,7 @@ if isDoubleQuoted || isSingleQuoted
     return;
 end
 
-if startsWith(rawValue, '{{')
+if ~isempty(regexp(rawValue, '^\{\s*\{', 'once'))
     rowTokens = regexp(rawValue, '\{([^{}]+)\}', 'tokens');
     if isempty(rowTokens)
         error('Cannot parse nested array for field %s: %s', fieldName, rawValue);
