@@ -1,6 +1,10 @@
 function plot_target_point_cloud(detections, figureOpts, resultsDir)
 %PLOT_TARGET_POINT_CLOUD Plot lateral/forward position and radial velocity.
 if isempty(detections)
+    file = fullfile(resultsDir,'target_point_cloud.png');
+    if figureOpts.save_png && isfile(file)
+        delete(file);
+    end
     return;
 end
 angle = detections.SelectedAngle_deg;
