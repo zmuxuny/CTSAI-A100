@@ -243,6 +243,10 @@ OMP 把角度导向矢量组成字典，逐次选择与残差相关性最大的�
 
 ## 12. 输出解释
 
+PNG 导出启用时，空检测结果会清理上一轮生成的 `angle_spectra.png` 与
+`target_point_cloud.png`，使结果图与当前检测表一致。关闭 PNG 导出时，
+已有结果文件保留。
+
 `detections.csv` 包含：
 
 - `Range_m`、`Velocity_mps`：整数 FFT 栅格的粗估计；

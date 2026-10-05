@@ -1,6 +1,10 @@
 function plot_angle_spectra(diagnostics, figureOpts, resultsDir)
 %PLOT_ANGLE_SPECTRA Compare four DOA spectra for strongest detection.
 if isempty(diagnostics)
+    file = fullfile(resultsDir,'angle_spectra.png');
+    if figureOpts.save_png && isfile(file)
+        delete(file);
+    end
     return;
 end
 fig = figure('Name','Angle Estimation','Visible',figureOpts.visible);
