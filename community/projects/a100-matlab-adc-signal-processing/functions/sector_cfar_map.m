@@ -24,7 +24,10 @@ numTrainingMap = zeros(size(powerMap));
 for iSector = 1:numSectors
     numTrainingMap(selectedSector == iSector) = sectorCounts(iSector);
 end
-alphaMap = cfar_alpha_ca(numTrainingMap, pfa);
+% Selection changes the noise statistic's distribution. Its multiplier
+% depends on all sectors, rather than the cell count of the winning sector.
+alpha = sector_cfar_alpha(sectorCounts,pfa,mode);
+alphaMap = alpha * ones(size(powerMap));
 thresholdMap = alphaMap .* noiseMap;
 mask = powerMap > thresholdMap;
 sectorMeanRatio = max(sectorMeans,[],3) ./ ...
