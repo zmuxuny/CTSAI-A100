@@ -60,13 +60,9 @@ for frame_idx = 1:numel(frame_values)
     end
 
     previous = current(end);
-    cost = abs(targets.range_m(frame_candidates) - targets.range_m(previous)) - ...
-           0.005 * targets.snr_db(frame_candidates);
-    [~, local_idx] = min(cost);
-    selected = frame_candidates(local_idx);
-    elapsed_gap_s = targets.elapsed_s(selected) - targets.elapsed_s(previous);
-    range_step_m = targets.range_m(selected) - targets.range_m(previous);
-    continuous = elapsed_gap_s >= 0 && elapsed_gap_s <= 2.0 && ...
+    elapsed_gap_s = targets.elapsed_s(frame_candidates) - targets.elapsed_s(previous);
+    range_step_m = targets.range_m(frame_candidates) - targets.range_m(previous);
+    continuous = elapsed_gap_s >= 0 & elapsed_gap_s <= 2.0 & ...
                  abs(range_step_m) <= 0.75;
     if strcmp(direction, 'approaching')
         directionally_plausible = range_step_m <= 0.35;
@@ -74,11 +70,17 @@ for frame_idx = 1:numel(frame_values)
         directionally_plausible = range_step_m >= -0.35;
     end
 
-    if continuous && directionally_plausible
-        current(end + 1, 1) = selected; %#ok<AGROW>
-    else
+    % Gate all candidates before ranking. An impossible high-SNR point must
+    % not break a segment when another candidate can extend it continuously.
+    eligible = frame_candidates(continuous & directionally_plausible);
+    if isempty(eligible)
         segments{end + 1} = current; %#ok<AGROW>
         current = seed_candidate(targets, frame_candidates, direction);
+    else
+        cost = abs(targets.range_m(eligible) - targets.range_m(previous)) - ...
+               0.005 * targets.snr_db(eligible);
+        [~, local_idx] = min(cost);
+        current(end + 1, 1) = eligible(local_idx); %#ok<AGROW>
     end
 end
 if ~isempty(current)

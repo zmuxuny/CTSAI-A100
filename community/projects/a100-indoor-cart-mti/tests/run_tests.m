@@ -11,6 +11,8 @@ tests = {@() test_environment(project_root), @test_adc_loader, ...
          @test_target_parser};
 names = {'environment', 'ADC loader', 'data manifest', ...
          'signal processing', 'target parser'};
+tests{end + 1} = @test_motion_track_gating;
+names{end + 1} = 'motion association gates';
 for idx = 1:numel(tests)
     fprintf('[TEST] %s ... ', names{idx});
     tests{idx}();
