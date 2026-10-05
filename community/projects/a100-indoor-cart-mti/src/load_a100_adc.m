@@ -23,13 +23,24 @@ if ~exist(file_path, 'file')
     error('a100:FileNotFound', 'ADC file not found: %s', file_path);
 end
 
-tokens = dlmread(file_path, ',');
-tokens = double(tokens(:));
+% dlmread substitutes zero for nonnumeric fields. Preserve every field so
+% malformed payload values cannot silently become valid zero ADC words.
+fields = regexp(strtrim(fileread(file_path)), '\s*,\s*', 'split');
+if ~isempty(fields) && isempty(fields{end})
+    fields(end) = []; % A single trailing CSV delimiter is allowed.
+end
+if any(cellfun(@isempty, fields))
+    error('a100:EmptyNumericToken', 'ADC file contains an empty numeric field.');
+end
+tokens = str2double(fields(:));
 if numel(tokens) < 3
     error('a100:MissingHeader', 'ADC file must start with three header fields.');
 end
 if any(~isfinite(tokens))
     error('a100:NonFiniteToken', 'ADC file contains a non-finite numeric token.');
+end
+if ~isreal(tokens)
+    error('a100:NonRealToken', 'ADC file contains a non-real numeric token.');
 end
 
 header = tokens(1:3).';
@@ -75,4 +86,3 @@ meta = struct('file', file_path, ...
               'padding_count', numel(padding), ...
               'padding_verified_zero', isempty(padding) || all(padding == 0));
 end
-
