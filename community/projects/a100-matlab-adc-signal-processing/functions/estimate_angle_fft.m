@@ -22,7 +22,6 @@ valid = abs(sinTheta) <= 1;
 fftAngles = asind(sinTheta(valid));
 fftSpectrum = fftSpectrum(valid);
 spectrum = interp1(fftAngles, fftSpectrum, angleGridDeg, 'linear', 0);
-[~, iPeak] = max(spectrum);
-result.angle_deg = angleGridDeg(iPeak);
+[result.angle_deg, result.valid] = angle_spectrum_peak(spectrum, angleGridDeg);
 result.spectrum = spectrum;
 end

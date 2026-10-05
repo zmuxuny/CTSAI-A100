@@ -4,7 +4,6 @@ snapshot = snapshot(:);
 projectionPower = abs(dictionary' * snapshot).^2;
 residualPower = max(norm(snapshot)^2 - projectionPower, eps);
 spectrum = 1 ./ residualPower;
-[~, iPeak] = max(spectrum);
-result.angle_deg = angleGridDeg(iPeak);
+[result.angle_deg, result.valid] = angle_spectrum_peak(spectrum, angleGridDeg);
 result.spectrum = spectrum.';
 end

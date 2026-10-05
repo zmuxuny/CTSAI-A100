@@ -8,6 +8,7 @@ if isempty(detections)
     detections.MUSIC_deg = zeros(0,1);
     detections.OMP_deg = zeros(0,1);
     detections.SelectedAngle_deg = zeros(0,1);
+    detections.SelectedAngleValid = false(0,1);
     return;
 end
 
@@ -86,4 +87,5 @@ switch upper(angleOpts.selected_method)
     otherwise
         error('Unknown selected angle method: %s', angleOpts.selected_method);
 end
+detections.SelectedAngleValid = isfinite(detections.SelectedAngle_deg);
 end
